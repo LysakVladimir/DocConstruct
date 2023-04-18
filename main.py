@@ -1,7 +1,10 @@
+from datetime import datetime
 from flask import Flask, render_template, redirect
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
+
 from forms.sign_in_form import SignInForm
 from forms.register_form import RegisterForm
+from forms.add_client_form import AddClientForm
 
 from data import db_session
 from data.user import User
@@ -25,6 +28,7 @@ def load_user(user_id):
 def index():
     if current_user.is_authenticated:
         return redirect("/clients")
+
     return redirect("/register")
 
 
@@ -32,6 +36,7 @@ def index():
 def clients():
     new_session = db_session.create_session()
     user_clients = new_session.query(Client).filter((Client.user == current_user))
+
     return render_template("clients.html", clients=user_clients)
 
 
@@ -54,6 +59,7 @@ def register():
     new_session.add(user)
     new_session.commit()
     login_user(user)
+
     return redirect("/clients")
 
 
@@ -71,6 +77,30 @@ def sign_in():
         return redirect("/clients")
 
     return render_template("sign_in.html", title="Авторизация", form=form, message="Неправильный логин или пароль")
+
+
+@app.route("/add_client", methods=["GET", "POST"])
+@login_required
+def add_client():
+    form = AddClientForm()
+
+    if form.validate_on_submit():
+        new_session = db_session.create_session()
+        client = Client()
+
+        client.surname = form.surname.data
+        client.name = form.name.data
+        client.patronymic = form.patronymic.data
+
+        client.address = form.address.data
+        client.birth_date = datetime.strptime(form.birth_date.data, "%d/%m/%Y")
+
+        current_user.clients.append(client)
+        new_session.merge(current_user)
+        new_session.commit()
+        return redirect("/clients")
+
+    return render_template("add_client.html", title="Новый клиент", form=form)
 
 
 @app.route("/log_out")

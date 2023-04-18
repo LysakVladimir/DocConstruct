@@ -2,21 +2,22 @@
 
 {% block content %}
 <header>
-<nav class="navbar navbar-light bg-light">
-    <a class="navbar-brand" href="/log_out">{{ current_user.name }}</a>
-</nav>
+    <nav class="navbar navbar-light bg-light">
+        <a class="navbar-brand" href="/log_out">{{ current_user.name }}</a>
+        <a class="btn btn-primary" href="/add_client">Добавить клиента</a>
+    </nav>
 </header>
 <h1>Клиенты</h1>
 {% for client in clients %}
-    <div class="col-md6 border rounded">
-        <h2>
-            {{client.surname}} {{client.name}} {{client.patronymic}}
-        </h2>
-        <div>
-            Дата добавления: {{client.created_date}}<br>
-            Дата рождения:   {{client.birth_date}}<br>
-            Адрес клиента:   {{client.address}}
-        </div>
+<div class="col-md6 border rounded">
+    <h2>
+        {{client.surname}} {{client.name}} {{client.patronymic}}
+    </h2>
+    <div>
+        Дата добавления: {{client.created_date}}<br>
+        Дата рождения: {{client.birth_date}}<br>
+        Адрес клиента: {{client.address}}
     </div>
+</div>
 {% endfor %}
 {% endblock %}

@@ -3,30 +3,40 @@
 {% block content %}
 <br>
 <br>
+<h5 align="center">Для входа на сайт требуется аккаунт. Войдите или зарегистрируйтесь.</h5>
+<br>
 <div class="register-text">
-    <h4 align="center">Для просмотра сначала зарегистрируйтесь или войдите</h4>
-    <h1 align="center">Регистрация</h1>
+    <h1>РЕГИСТРАЦИЯ</h1>
 </div>
 <br>
 <form class="login_form" method="post">
     {{ form.hidden_tag() }}
-    <div class="input-group input-group-sm mb-3">
-        <span class="input-group-text" id="username">{{ form.name.label }}</span>
-        <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm">
+    <div class="reg-input">
+        <span class="input-group-text">ВВЕДИТЕ ИМЯ ПОЛЬЗОВАТЕЛЯ</span>
+        <br>
+        <input type="text" class="form-control" id="name">
     </div>
-    <div class="input-group input-group-sm mb-3">
-        <span class="input-group-text" id="email">{{ form.email.label }}</span>
-        <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm">
+    <br>
+    <div class="reg-input">
+        <span class="input-group-text">ВВЕДИТЕ ПОЧТУ</span>
+        <br>
+        <input type="email" class="form-control" id="email">
+    <br>
     </div>
-    <div class="input-group input-group-sm mb-3">
-        <span class="input-group-text" id="password">{{ form.password.label }}</span>
-        <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm">
+    <div class="reg-input">
+        <span class="input-group-text">ВВЕДИТЕ ПАРОЛЬ</span>
+        <br>
+        <input type="password" class="form-control" id="password">
     </div>
-    <div class="input-group input-group-sm mb-3">
-        <span class="input-group-text" id="password_again">{{ form.password_again.label }}</span>
-        <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm">
-    </div>
+    <br>
+    <div class="reg-input">
+        <span class="input-group-text">ПОВТОРИТЕ ПАРОЛЬ</span>
+        <br>
+        <input type="password" class="form-control" id="password_again">
+    <br>
     <button type="submit" class="btn btn-dark">{{ form.submit.label }}</button>
+    </div>
+    <br>
     <div>
         {{message}}
     </div>

@@ -1,5 +1,5 @@
 from datetime import datetime
-from flask import Flask, render_template, redirect
+from flask import Flask, render_template, redirect, request
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 
 from forms.sign_in_form import SignInForm
@@ -11,7 +11,7 @@ from data.user import User
 from data.client import Client
 
 app = Flask(__name__)
-app.config["SECRET_KEY"] = "secret key"
+app.config["SECRET_KEY"] = "DocC_Shield"
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -46,13 +46,13 @@ def register():
     new_session = db_session.create_session()
 
     if not form.validate_on_submit():
-        return render_template("register.html", title="Регистрация", form=form)
+        return render_template("register.html", form=form)
 
     if form.password.data != form.password_again.data:
-        return render_template("register.html", title="Регистрация", form=form, message="Пароли не совпадают")
+        return render_template("register.html", form=form, message="Пароли не совпадают")
 
     if new_session.query(User).filter(User.email == form.email.data).first():
-        return render_template("register.html", title="Регистрация", form=form, message="Такой пользователь уже есть")
+        return render_template("register.html", form=form, message="Такой пользователь уже есть")
 
     user = User(name=form.name.data, email=form.email.data)
     user.set_password(form.password.data)
@@ -69,14 +69,14 @@ def sign_in():
     new_session = db_session.create_session()
 
     if not form.validate_on_submit():
-        return render_template("sign_in.html", title="Авторизация", form=form)
+        return render_template("sign_in.html", form=form)
 
     user = new_session.query(User).filter(User.email == form.email.data).first()
     if user and user.check_password(form.password.data):
         login_user(user, remember=form.remember_me.data)
         return redirect("/clients")
 
-    return render_template("sign_in.html", title="Авторизация", form=form, message="Неправильный логин или пароль")
+    return render_template("sign_in.html", form=form, message="Неправильный логин или пароль")
 
 
 @app.route("/add_client", methods=["GET", "POST"])
@@ -93,14 +93,65 @@ def add_client():
         client.patronymic = form.patronymic.data
 
         client.address = form.address.data
+        """------------------------ НАДО ИСПРАВИТЬ ЭТУ ДИЧЬ ------------------------"""
         client.birth_date = datetime.strptime(form.birth_date.data, "%d/%m/%Y")
 
-        current_user.clients.append(client)
+        current_user.new_document.append(client)
         new_session.merge(current_user)
         new_session.commit()
         return redirect("/clients")
 
     return render_template("add_client.html", title="Новый клиент", form=form)
+
+
+@app.route("/edit_client/<int:id>", methods=["GET", "POST"])
+@login_required
+def edit_client(id):
+    form = AddClientForm()
+
+    if request.method == "GET":
+        new_session = db_session.create_session()
+        client = new_session.query(Client).filter(Client.id == id).first()
+
+        form.surname.data = client.surname
+        form.name.data = client.name
+        form.patronymic.data = client.patronymic
+        form.address.data = client.address
+        """------------------------ НАДО ИСПРАВИТЬ ЭТУ ДИЧЬ ------------------------"""
+        form.birth_date.data = "/".join(str(client.birth_date).split()[0].split("-")[::-1])
+
+    if form.validate_on_submit():
+        new_session = db_session.create_session()
+        client = new_session.query(Client).filter(Client.id == id).first()
+
+        client.surname = form.surname.data
+        client.name = form.name.data
+        client.patronymic = form.patronymic.data
+        client.address = form.address.data
+        """------------------------ НАДО ИСПРАВИТЬ ЭТУ ДИЧЬ ------------------------"""
+        client.birth_date = datetime.strptime(form.birth_date.data, "%d/%m/%Y")
+
+        new_session.commit()
+        return redirect("/clients")
+
+    return render_template("add_client.html", title="Редактирование клиента", form=form)
+
+
+@app.route("/new_document")
+def new_document():
+    # new_session = db_session.create_session()
+    # user_clients = new_session.query(Client).filter((Client.user == current_user))
+    return redirect("/")
+
+
+@app.route("/remove_client/<int:id>", methods=["GET", "POST"])
+@login_required
+def remove_client(id):
+    new_session = db_session.create_session()
+    client = new_session.query(Client).filter(Client.id == id).first()
+    new_session.delete(client)
+    new_session.commit()
+    return redirect("/clients")
 
 
 @app.route("/log_out")
@@ -112,7 +163,6 @@ def log_out():
 
 if __name__ == "__main__":
     db_session.global_init("db/db_flask.db")
-
     session = db_session.create_session()
 
     app.run(debug=True)

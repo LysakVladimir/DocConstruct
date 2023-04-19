@@ -10,4 +10,4 @@ class AddClientForm(FlaskForm):
 
     address = StringField("Адрес", validators=[DataRequired()])
     birth_date = StringField("Дата рождения", validators=[DataRequired()])
-    submit = SubmitField("Добавить")
+    submit = SubmitField("Применить")

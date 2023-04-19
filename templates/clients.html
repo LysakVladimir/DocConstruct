@@ -18,6 +18,18 @@
         Дата рождения: {{client.birth_date}}<br>
         Адрес клиента: {{client.address}}
     </div>
+    <br>
+    <div>
+        <a class="btn btn-danger" href="/remove_client/{{ client.id }}">Удалить</a>
+        <a class="btn btn-primary" href="/edit_client/{{ client.id }}">Изменить</a>
+        <select>
+            <option>Пункт 1</option>
+            <option>Пункт 2</option>
+        </select>
+        <a class="btn btn-primary" href="/">+</a>
+    </div>
 </div>
+<br>
+<br>
 {% endfor %}
 {% endblock %}

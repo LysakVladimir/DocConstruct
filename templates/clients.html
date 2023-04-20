@@ -23,10 +23,11 @@
         <a class="btn btn-danger" href="/remove_client/{{ client.id }}">Удалить</a>
         <a class="btn btn-primary" href="/edit_client/{{ client.id }}">Изменить</a>
         <select>
-            <option>Пункт 1</option>
-            <option>Пункт 2</option>
+            <option>document 1</option>
+            <option>document 2</option>
         </select>
-        <a class="btn btn-primary" href="/">+</a>
+<!--Вместо document.docx должен стоять какой-либо выбранный документ из списка-->
+        <a class="btn btn-primary" href="/static/documents/document.docx" download>+</a>
     </div>
 </div>
 <br>

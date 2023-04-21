@@ -11,7 +11,7 @@ from data.user import User
 from data.client import Client
 
 app = Flask(__name__)
-app.config["SECRET_KEY"] = "secret key"
+app.config["SECRET_KEY"] = "DocC_Shield"
 
 login_manager = LoginManager()
 login_manager.init_app(app)

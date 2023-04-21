@@ -1,0 +1,44 @@
+.register-text {
+  font-family: 'Oswald', sans-serif !important;
+  border: 2px solid black;
+  padding: 20px;
+   background: #373737;
+  border-color: white;
+  border-radius: 10px;
+  text-align: center
+}
+.login_form {
+    max-width: 800px;
+    margin: 0 auto;
+}
+.input-group-text {
+  background: #373737;
+  max-width: 400px;
+  background-position: center;
+  display: inline;
+  color: #f4f4f4;
+  border: 0px;
+  border-radius: 15px;
+  text-align: center;
+  margin: 0 auto;
+  font-size: 25px;
+  font-family: 'Oswald', sans-serif !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.form-control {
+   background: #373737;
+   border-color: grey;
+   color: white;
+   max-width: 600px;
+   margin: 0 auto;
+   font-size: 22px;
+  font-family: 'Oswald', sans-serif !important;
+}
+button {
+  float: right;
+}
+h5 {
+  font-family: 'Oswald', sans-serif !important;
+}

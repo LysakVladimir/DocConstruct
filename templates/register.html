@@ -3,7 +3,11 @@
 {% block content %}
 <br>
 <br>
+{% if not message %}
 <h5 align="center">Для входа на сайт требуется аккаунт. Войдите или зарегистрируйтесь.</h5>
+{% else %}
+<h5 align="center" style="color: red">Ошибка. {{ message }}.</h5>
+{% endif %}
 <br>
 <div class="register-text">
     <h1>РЕГИСТРАЦИЯ</h1>
@@ -12,33 +16,35 @@
 <form class="login_form" method="post">
     {{ form.hidden_tag() }}
     <div class="reg-input">
-        <span class="input-group-text">ВВЕДИТЕ ИМЯ ПОЛЬЗОВАТЕЛЯ</span>
+        {{ form.name.label(class="input-group-text") }}
         <br>
-        <input type="text" class="form-control" id="name">
+        {{ form.name(class='form-control') }}
     </div>
     <br>
     <div class="reg-input">
-        <span class="input-group-text">ВВЕДИТЕ ПОЧТУ</span>
+        {{ form.email.label(class="input-group-text") }}
         <br>
-        <input type="email" class="form-control" id="email">
+        {{ form.email(class='form-control') }}
     <br>
     </div>
     <div class="reg-input">
-        <span class="input-group-text">ВВЕДИТЕ ПАРОЛЬ</span>
+        {{ form.password.label(class="input-group-text") }}
         <br>
-        <input type="password" class="form-control" id="password">
+        {{ form.password(class='form-control') }}
     </div>
     <br>
     <div class="reg-input">
-        <span class="input-group-text">ПОВТОРИТЕ ПАРОЛЬ</span>
+        {{ form.password_again.label(class="input-group-text") }}
         <br>
-        <input type="password" class="form-control" id="password_again">
+        {{ form.password_again(class='form-control') }}
     <br>
-    <button type="submit" class="btn btn-dark">{{ form.submit.label }}</button>
+    {{ form.submit(class="btn btn-dark") }}
     </div>
     <br>
-    <div>
-        {{message}}
-    </div>
+    <br>
 </form>
+{% endblock %}
+{% block header %}
+    {{ super() }}
+    <a class="btn btn-secondary ms-auto" type="button" style="margin-right: 10px; font-family: 'Oswald', sans-serif !important; font-size: 20px;" href="/sign_in">Войти</a>
 {% endblock %}

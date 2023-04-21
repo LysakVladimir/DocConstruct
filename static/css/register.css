@@ -2,20 +2,25 @@
   font-family: 'Oswald', sans-serif !important;
   border: 2px solid black;
   padding: 20px;
-   background: #373737;
+  max-width: 700px;
+  background: #373737;
   border-color: white;
   border-radius: 10px;
-  text-align: center
+  text-align: center;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .login_form {
     max-width: 800px;
     margin: 0 auto;
+    text-align: center;
 }
 .input-group-text {
   background: #373737;
   max-width: 400px;
   background-position: center;
-  display: inline;
   color: #f4f4f4;
   border: 0px;
   border-radius: 15px;
@@ -34,11 +39,19 @@
    max-width: 600px;
    margin: 0 auto;
    font-size: 22px;
-  font-family: 'Oswald', sans-serif !important;
+   font-family: 'Oswald', sans-serif !important;
 }
-button {
+.btn {
   float: right;
+  font-family: 'Oswald', sans-serif !important;
+  font-size: 20px;
+  margin-right: 70px
 }
+
+button {
+   float: right;
+}
+
 h5 {
   font-family: 'Oswald', sans-serif !important;
 }

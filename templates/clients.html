@@ -11,23 +11,28 @@
 {% for client in clients %}
 <div class="col-md6 border rounded">
     <h2>
-        {{client.surname}} {{client.name}} {{client.patronymic}}
+        {{ client.surname }} {{ client.name }} {{ client.patronymic }}
     </h2>
     <div>
-        Дата добавления: {{client.created_date}}<br>
-        Дата рождения: {{client.birth_date}}<br>
-        Адрес клиента: {{client.address}}
+        Дата добавления: {{ client.created_date }}<br>
+        Дата рождения: {{ client.birth_date }}<br>
+        Адрес клиента: {{ client.address }}
     </div>
     <br>
     <div>
+    <form method="post">
         <a class="btn btn-danger" href="/remove_client/{{ client.id }}">Удалить</a>
         <a class="btn btn-primary" href="/edit_client/{{ client.id }}">Изменить</a>
-        <select>
-            <option>document 1</option>
-            <option>document 2</option>
+        <select name="document_id">
+            <option value="0">Ходатайство об обеспечении иска</option>
+            <option value="1">Заявление о выдачи испольнительного листа</option>
+            <option value="2">Исковое заявление о защите чести</option>
+            <option value="3">Исковое заявление о разделе наследства</option>
+            <option value="4">Исковое заявление об обжаловании дисциплинарного взыскания</option>
+            <option value="5">Ходатайство об истребовании документа</option>
         </select>
-<!--Вместо document.docx должен стоять какой-либо выбранный документ из списка-->
-        <a class="btn btn-primary" href="/static/documents/document.docx" download>+</a>
+        <button class="btn btn-primary" name="client_id" value="{{ client.id }}" type="submit">+</button>
+    </form>
     </div>
 </div>
 <br>

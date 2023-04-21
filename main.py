@@ -1,4 +1,5 @@
 from datetime import datetime
+from docxtpl import DocxTemplate
 from flask import Flask, render_template, redirect, request
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 
@@ -16,6 +17,15 @@ app.config["SECRET_KEY"] = "secret key"
 login_manager = LoginManager()
 login_manager.init_app(app)
 
+DOCUMENTS = (
+    "Ходатайство об обеспечении иска",
+    "Заявление о выдачи испольнительного листа",
+    "Исковое заявление о защите чести",
+    "Исковое заявление о разделе наследства",
+    "Исковое заявление об обжаловании дисциплинарного взыскания",
+    "Ходатайство об истребовании документа"
+)
+
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -32,11 +42,13 @@ def index():
     return redirect("/register")
 
 
-@app.route("/clients")
+@app.route("/clients", methods=["GET", "POST"])
 def clients():
+    if request.method == "POST":
+        return redirect(f"""/new_document/{request.form.get("document_id")}/{request.form.get("client_id")}""")
+
     new_session = db_session.create_session()
     user_clients = new_session.query(Client).filter((Client.user == current_user))
-
     return render_template("clients.html", title="Клиенты", clients=user_clients)
 
 
@@ -104,14 +116,14 @@ def add_client():
     return render_template("add_client.html", title="Новый клиент", form=form)
 
 
-@app.route("/edit_client/<int:id>", methods=["GET", "POST"])
+@app.route("/edit_client/<int:client_id>", methods=["GET", "POST"])
 @login_required
-def edit_client(id):
+def edit_client(client_id):
     form = AddClientForm()
 
     if request.method == "GET":
         new_session = db_session.create_session()
-        client = new_session.query(Client).filter(Client.id == id).first()
+        client = new_session.query(Client).filter(Client.id == client_id).first()
 
         form.surname.data = client.surname
         form.name.data = client.name
@@ -122,7 +134,7 @@ def edit_client(id):
 
     if form.validate_on_submit():
         new_session = db_session.create_session()
-        client = new_session.query(Client).filter(Client.id == id).first()
+        client = new_session.query(Client).filter(Client.id == client_id).first()
 
         client.surname = form.surname.data
         client.name = form.name.data
@@ -137,14 +149,45 @@ def edit_client(id):
     return render_template("add_client.html", title="Редактирование клиента", form=form)
 
 
-@app.route("/remove_client/<int:id>", methods=["GET", "POST"])
+@app.route("/remove_client/<int:client_id>", methods=["GET", "POST"])
 @login_required
-def remove_client(id):
+def remove_client(client_id):
     new_session = db_session.create_session()
-    client = new_session.query(Client).filter(Client.id == id).first()
+    client = new_session.query(Client).filter(Client.id == client_id).first()
     new_session.delete(client)
     new_session.commit()
     return redirect("/clients")
+
+
+@app.route("/new_document/<int:document_id>/<int:client_id>", methods=["GET", "POST"])
+@login_required
+def new_document(document_id, client_id):
+    if request.method == "POST":
+        return redirect("/clients")
+
+    new_session = db_session.create_session()
+    client = new_session.query(Client).filter(Client.id == client_id).first()
+
+    document_way = "/static/documents/NewDocument.docx"
+    document = DocxTemplate(f"static/documents/{document_id}.docx")
+
+    context = {
+        "surname":          client.surname,
+        "name":             client.name,
+        "patronymic":       client.patronymic,
+        "address":          client.address,
+        "birth_date_place": client.birth_date
+    }
+    document.render(context)
+    document.save(f"./{document_way}")
+
+    return render_template(
+        "new_document.html",
+        title="Новый документ",
+        document_name=DOCUMENTS[document_id],
+        document_way=document_way,
+        client=client
+    )
 
 
 @app.route("/log_out")

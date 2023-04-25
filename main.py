@@ -2,7 +2,6 @@ from datetime import datetime
 from docxtpl import DocxTemplate
 from flask import Flask, render_template, redirect, request
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
-
 from forms.sign_in_form import SignInForm
 from forms.register_form import RegisterForm
 from forms.add_client_form import AddClientForm
@@ -13,9 +12,9 @@ from data.client import Client
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "DocC_Shield"
-
 login_manager = LoginManager()
 login_manager.init_app(app)
+
 
 DOCUMENTS = (
     "Ходатайство об обеспечении иска",
@@ -43,30 +42,39 @@ def index():
 
 
 @app.route("/clients", methods=["GET", "POST"])
+@login_required
 def clients():
     if request.method == "POST":
         return redirect(f"""/new_document/{request.form.get("document_id")}/{request.form.get("client_id")}""")
 
     new_session = db_session.create_session()
     user_clients = new_session.query(Client).filter((Client.user == current_user))
-    return render_template("clients.html", title="Клиенты", clients=user_clients)
+    return render_template("clients.html", title="Клиенты", clients=user_clients, user=current_user)
 
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
+    if current_user.is_authenticated:
+        return redirect("/clients")
     form = RegisterForm()
     new_session = db_session.create_session()
 
     if not form.validate_on_submit():
-        return render_template("register.html", title="Регистрация", form=form)
+        return render_template("register.html", title="Регистрация", form=form, user=current_user)
+
+    if len(form.name.data) > 16:
+        return render_template("register.html", title="Регистрация", form=form,
+                               message="Слишком длинное имя. Не более 16 символов", user=current_user)
 
     if form.password.data != form.password_again.data:
-        return render_template("register.html", title="Регистрация", form=form, message="Пароли не совпадают")
+        return render_template("register.html", title="Регистрация", form=form,
+                               message="Пароли не совпадают", user=current_user)
 
     if new_session.query(User).filter(User.email == form.email.data).first():
-        return render_template("register.html", title="Регистрация", form=form, message="Такой пользователь уже есть")
+        return render_template("register.html", title="Регистрация", form=form,
+                               message="Пользователь с данной почтой уже существует.", user=current_user)
 
-    user = User(name=form.name.data, email=form.email.data)
+    user = User(name=form.name.data, email=form.email.data.lower())
     user.set_password(form.password.data)
     new_session.add(user)
     new_session.commit()
@@ -77,18 +85,21 @@ def register():
 
 @app.route("/sign_in", methods=["GET", "POST"])
 def sign_in():
+    if current_user.is_authenticated:
+        return redirect("/clients")
     form = SignInForm()
     new_session = db_session.create_session()
 
     if not form.validate_on_submit():
-        return render_template("sign_in.html", title="Авторизация", form=form)
+        return render_template("sign_in.html", title="Авторизация", form=form, user=current_user)
 
-    user = new_session.query(User).filter(User.email == form.email.data).first()
+    user = new_session.query(User).filter(User.email == form.email.data.lower()).first()
     if user and user.check_password(form.password.data):
         login_user(user, remember=form.remember_me.data)
         return redirect("/clients")
 
-    return render_template("sign_in.html", title="Авторизация", form=form, message="Неправильный логин или пароль")
+    return render_template("sign_in.html", title="Авторизация",
+                           form=form, message="Неправильный логин или пароль", user=current_user)
 
 
 @app.route("/add_client", methods=["GET", "POST"])
@@ -105,15 +116,14 @@ def add_client():
         client.patronymic = form.patronymic.data
 
         client.address = form.address.data
-        """------------------------ НАДО ИСПРАВИТЬ ЭТУ ДИЧЬ ------------------------"""
-        client.birth_date = datetime.strptime(form.birth_date.data, "%d/%m/%Y")
+        client.birth_date = datetime.strptime(form.birth_date.data, "%Y-%m-%d")
 
         current_user.clients.append(client)
         new_session.merge(current_user)
         new_session.commit()
         return redirect("/clients")
 
-    return render_template("add_client.html", title="Новый клиент", form=form)
+    return render_template("add_client.html", title="Новый клиент", form=form, user=current_user)
 
 
 @app.route("/edit_client/<int:client_id>", methods=["GET", "POST"])
@@ -141,12 +151,12 @@ def edit_client(client_id):
         client.patronymic = form.patronymic.data
         client.address = form.address.data
         """------------------------ НАДО ИСПРАВИТЬ ЭТУ ДИЧЬ ------------------------"""
-        client.birth_date = datetime.strptime(form.birth_date.data, "%d/%m/%Y")
+        client.birth_date = datetime.strptime(form.birth_date.data, "%Y-%m-%d")
 
         new_session.commit()
         return redirect("/clients")
 
-    return render_template("add_client.html", title="Редактирование клиента", form=form)
+    return render_template("add_client.html", title="Редактирование клиента", form=form, user=current_user)
 
 
 @app.route("/remove_client/<int:client_id>", methods=["GET", "POST"])
@@ -186,13 +196,24 @@ def new_document(document_id, client_id):
         title="Новый документ",
         document_name=DOCUMENTS[document_id],
         document_way=document_way,
-        client=client
+        client=client,
+        user=current_user
     )
 
 
-@app.route("/log_out")
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('404.html', user=current_user), 404
+
+
+@app.errorhandler(401)
+def unauthorized(e):
+    return redirect('/sign_in')
+
+
+@app.route("/logout")
 @login_required
-def log_out():
+def logout():
     logout_user()
     return redirect("/register")
 

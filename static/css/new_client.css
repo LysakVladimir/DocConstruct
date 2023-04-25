@@ -1,0 +1,62 @@
+.register-text {
+  font-family: 'Oswald', sans-serif !important;
+  border: 2px solid black;
+  padding: 20px;
+  max-width: 500px;
+  background: #373737;
+  border-color: #373737;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.login_form {
+    max-width: 1000px;
+    align-items: center;
+}
+.input-group-text {
+  background: #373737;
+  max-width: 400px;
+  color: #f4f4f4;
+  border: 0px;
+  border-radius: 15px;
+  font-size: 25px;
+  font-family: 'Oswald', sans-serif !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.form-control {
+   background: #373737;
+   border-color: grey;
+   color: white;
+   max-width: 600px;
+   margin: 0 auto;
+   font-size: 22px;
+   font-family: 'Oswald', sans-serif !important;
+}
+.btn {
+  float: right;
+  font-family: 'Oswald', sans-serif !important;
+  font-size: 20px;
+  margin-right: 70px
+}
+
+button {
+   float: right;
+}
+
+h5 {
+  font-family: 'Oswald', sans-serif !important;
+}
+.reg-input {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.reg-input > div {
+  flex: 1 1 50%;
+}
+div {
+  line-height: 1.5;
+}

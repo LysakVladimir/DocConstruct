@@ -1,38 +1,42 @@
 {% extends "header.html" %}
-
+{% block head %}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/clients.css') }}">
+{% endblock %}
 {% block content %}
-<header>
-    <nav class="navbar navbar-light bg-light">
-        <a class="navbar-brand" href="/log_out">{{ current_user.name }}</a>
-        <a class="btn btn-primary" href="/add_client">Добавить клиента</a>
-    </nav>
-</header>
-<h1>Клиенты</h1>
+<h1 style="
+text-align: center;
+font-family: 'Oswald', sans-serif !important;
+font-size: 50px;
+margin-top: 10px">Клиенты</h1>
 {% for client in clients %}
-<div class="col-md6 border rounded">
-    <h2>
+<div class="client-info">
+    <h2 style="text-align: center; margin-top: 10px; font-family: 'Oswald', sans-serif !important;">
         {{ client.surname }} {{ client.name }} {{ client.patronymic }}
     </h2>
-    <div>
-        Дата добавления: {{ client.created_date }}<br>
-        Дата рождения: {{ client.birth_date }}<br>
-        Адрес клиента: {{ client.address }}
+    <div class="dates">
+        <div class="text">Дата добавления</div>
+        <div class="date">{{ client.created_date.strftime('%Y-%m-%d %H:%M') }}</div>
+        <div class="text">Дата рождения</div>
+        <div class="date">{{ client.birth_date.strftime('%Y-%m-%d') }}</div><br><br>
+        <div class="text">Адрес клиента</div>
+        <div class="address">{{ client.address }}</div>
     </div>
     <br>
     <div>
     <form method="post">
         <a class="btn btn-danger" href="/remove_client/{{ client.id }}">Удалить</a>
         <a class="btn btn-primary" href="/edit_client/{{ client.id }}">Изменить</a>
-        <select name="document_id">
-            <option value="0">Ходатайство об обеспечении иска</option>
-            <option value="1">Заявление о выдачи испольнительного листа</option>
-            <option value="2">Исковое заявление о защите чести</option>
-            <option value="3">Исковое заявление о разделе наследства</option>
-            <option value="4">Исковое заявление об обжаловании дисциплинарного взыскания</option>
-            <option value="5">Ходатайство об истребовании документа</option>
-        </select>
-        <button class="btn btn-primary" name="client_id" value="{{ client.id }}" type="submit">+</button>
-    </form>
+
+<!--        <select name="document_id">-->
+<!--            <option value="0">Ходатайство об обеспечении иска</option>-->
+<!--            <option value="1">Заявление о выдачи испольнительного листа</option>-->
+<!--            <option value="2">Исковое заявление о защите чести</option>-->
+<!--            <option value="3">Исковое заявление о разделе наследства</option>-->
+<!--            <option value="4">Исковое заявление об обжаловании дисциплинарного взыскания</option>-->
+<!--            <option value="5">Ходатайство об истребовании документа</option>-->
+<!--        </select>-->
+<!--        <button class="btn btn-primary" name="client_id" value="{{ client.id }}" type="submit">+</button>-->
+    </form><br>
     </div>
 </div>
 <br>

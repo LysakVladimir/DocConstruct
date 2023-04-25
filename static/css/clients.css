@@ -1,0 +1,20 @@
+.client-info {
+  background-color: #373737;
+  border-radius: 25px;
+  max-width: 700px;
+  background-position: center;
+  text-align: center;
+  margin: 0 auto;
+}
+.client-info div {
+  display: inline-block;
+  margin-right: 10px;
+}
+.text {
+    background-color: gray;
+    border-radius: 20px;
+    text-align: center;
+    width: 150px;
+    padding: 10px;
+    font-family: 'Oswald', sans-serif !important;
+}

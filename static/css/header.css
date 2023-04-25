@@ -5,8 +5,22 @@ body
 }
 
 .navbar-brand {
-    font-family: 'Oswald', sans-serif !important;
-    text-align: center
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  font-family: 'Oswald', sans-serif !important;
+  font-size: 20px;
+}
+
+.navbar-brand img {
+  margin-right: 10px;
+  width: 35px;
+  height: 35px;
+}
+
+.navbar-brand span {
+  display: inline-block;
 }
 
 .header

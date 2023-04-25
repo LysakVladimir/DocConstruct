@@ -4,10 +4,10 @@ from wtforms.validators import DataRequired
 
 
 class AddClientForm(FlaskForm):
-    surname = StringField("Фамилия", validators=[DataRequired()])
-    name = StringField("Имя", validators=[DataRequired()])
-    patronymic = StringField("Отчество", validators=[DataRequired()])
+    surname = StringField("ФАМИЛИЯ", validators=[DataRequired()])
+    name = StringField("ИМЯ", validators=[DataRequired()])
+    patronymic = StringField("ОТЧЕСТВО", validators=[DataRequired()])
 
-    address = StringField("Адрес", validators=[DataRequired()])
-    birth_date = StringField("Дата рождения", validators=[DataRequired()])
+    address = StringField("АДРЕС", validators=[DataRequired()])
+    birth_date = StringField("ДАТА РОЖДЕНИЯ", validators=[DataRequired()])
     submit = SubmitField("Применить")

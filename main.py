@@ -139,8 +139,7 @@ def edit_client(client_id):
         form.name.data = client.name
         form.patronymic.data = client.patronymic
         form.address.data = client.address
-        """------------------------ НАДО ИСПРАВИТЬ ЭТУ ДИЧЬ ------------------------"""
-        form.birth_date.data = "/".join(str(client.birth_date).split()[0].split("-")[::-1])
+        form.birth_date.data = ".".join(str(client.birth_date).split()[0].split(".")[::-1])
 
     if form.validate_on_submit():
         new_session = db_session.create_session()
@@ -150,7 +149,6 @@ def edit_client(client_id):
         client.name = form.name.data
         client.patronymic = form.patronymic.data
         client.address = form.address.data
-        """------------------------ НАДО ИСПРАВИТЬ ЭТУ ДИЧЬ ------------------------"""
         client.birth_date = datetime.strptime(form.birth_date.data, "%Y-%m-%d")
 
         new_session.commit()

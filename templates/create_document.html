@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Создать документ</h1>
+<br>
+<form method="post">
+    <h3>Выберите клиента</h3>
+    <select name="client_id">
+        {% for client in clients %}
+        <option value="{{ client.id }}">{{ client.surname }} {{ client.name }} {{ client.patronymic }}</option>
+        {% endfor %}
+    </select>
+    <br>
+    <br>
+    <h3>Выберите документ</h3>
+    {% for document in documents %}
+    <p><input name="document_id" type="radio" value="{{ document[0] }}"> {{ document[1] }}</p>
+    {% endfor %}
+    <button class="btn btn-primary" type="submit">Скачать документ</button>
+    <a class="btn btn-primary" href="/clients">Назад</a>
+</form>
+<h3>{{ message }}</h3>
+{% endblock %}

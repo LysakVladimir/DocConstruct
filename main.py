@@ -41,12 +41,9 @@ def index():
     return redirect("/register")
 
 
-@app.route("/clients", methods=["GET", "POST"])
+@app.route("/clients")
 @login_required
 def clients():
-    if request.method == "POST":
-        return redirect(f"""/new_document/{request.form.get("document_id")}/{request.form.get("client_id")}""")
-
     new_session = db_session.create_session()
     user_clients = new_session.query(Client).filter((Client.user == current_user))
     return render_template("clients.html", title="Клиенты", clients=user_clients, user=current_user)
@@ -167,18 +164,20 @@ def remove_client(client_id):
     return redirect("/clients")
 
 
-@app.route("/new_document/<int:document_id>/<int:client_id>", methods=["GET", "POST"])
-@login_required
-def new_document(document_id, client_id):
-    if request.method == "POST":
-        return redirect("/clients")
-
+@app.route("/create_document", methods=["GET", "POST"])
+def new_document():
     new_session = db_session.create_session()
-    client = new_session.query(Client).filter(Client.id == client_id).first()
+    user_clients = new_session.query(Client).filter((Client.user == current_user))
 
-    document_way = "/static/documents/NewDocument.docx"
-    document = DocxTemplate(f"static/documents/{document_id}.docx")
+    if request.method == "GET" or not (document_id := request.form.get("document_id")):
+        return render_template(
+            "create_document.html",
+            title="Новый документ",
+            clients=user_clients,
+            documents=enumerate(DOCUMENTS)
+        )
 
+    client = new_session.query(Client).filter(Client.id == request.form.get("client_id")).first()
     context = {
         "surname":          client.surname,
         "name":             client.name,
@@ -186,17 +185,11 @@ def new_document(document_id, client_id):
         "address":          client.address,
         "birth_date_place": client.birth_date
     }
+    document_way = """/static/documents/NewDocument.docx"""
+    document = DocxTemplate(f"""static/documents/{document_id}.docx""")
     document.render(context)
     document.save(f"./{document_way}")
-
-    return render_template(
-        "new_document.html",
-        title="Новый документ",
-        document_name=DOCUMENTS[document_id],
-        document_way=document_way,
-        client=client,
-        user=current_user
-    )
+    return redirect("/static/documents/NewDocument.docx")
 
 
 @app.errorhandler(404)

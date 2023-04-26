@@ -17,7 +17,7 @@ margin-top: 10px">Клиенты</h1>
     <br>
         <div><p class="text">Дата добавления</p> {{ client.created_date.strftime('%Y-%m-%d %H:%M') }} <a style='float: right; margin-right: 20px; width: 160px' class="btn btn-danger" href="/remove_client/{{ client.id }}">Удалить клиента</a></div>
         <div><p class="text">Дата рождения</p> {{ client.birth_date.strftime('%Y-%m-%d') }} <a class="btn btn-primary" style='float: right; margin-right: 20px; width: 160px' href="/edit_client/{{ client.id }}">Редактировать</a></div>
-        <div><p class="text">Адрес клиента</p> {{ client.address }} <a class="btn btn-primary" style='float: right; margin-right: 20px; width: 160px' href="/edit_client/{{ client.id }}">Показать на карте</a></div>
+        <div><p class="text">Адрес клиента</p> {{ client.address }} <a class="btn btn-primary" style='float: right; margin-right: 20px; width: 160px' href="/show_address/{{ client.id }}">Показать на карте</a></div>
     <br>
 </div>
 <br>

@@ -1,23 +1,47 @@
-{% extends "base.html" %}
-
+{% extends "header.html" %}
+{% block head %}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/new_document.css') }}">
+{% endblock %}
 {% block content %}
-<h1>Создать документ</h1>
+<br>
+<br>
+<div class="register-text">
+    <h1>СОЗДАНИЕ ДОКУМЕНТА</h1>
+</div>
 <br>
 <form method="post">
-    <h3>Выберите клиента</h3>
-    <select name="client_id">
-        {% for client in clients %}
-        <option value="{{ client.id }}">{{ client.surname }} {{ client.name }} {{ client.patronymic }}</option>
-        {% endfor %}
-    </select>
+    <div style="
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;">
+        <p class="text">Выберите клиента:</p>
+        <select class="selecting" name="client_id">
+            {% if clients.count() != 0 %}
+            {% for client in clients %}
+            <option value="{{ client.id }}">{{ client.surname }} {{ client.name }} {{ client.patronymic }}</option>
+            {% endfor %}
+            {% else %}
+            <option value="Nothing">Клиентов нет</option>
+            {% endif %}
+        </select>
+    </div>
     <br>
+    <h4 class="select-text">ТИП ДОКУМЕНТА</h4>
     <br>
-    <h3>Выберите документ</h3>
+    <div>
     {% for document in documents %}
-    <p><input name="document_id" type="radio" value="{{ document[0] }}"> {{ document[1] }}</p>
+    <label>
+        <input type="radio" name="document_id" value="{{ document[0] }}" {% if loop.first %} checked {% endif %}>
+        <img src="{{ url_for('static',filename='img/document.png') }}" alt="Option 1">
+        <span class="radio-text">{{ document[1] }}</span>
+    </label>
     {% endfor %}
-    <button class="btn btn-primary" type="submit">Скачать документ</button>
-    <a class="btn btn-primary" href="/clients">Назад</a>
+    </div>
+    <button class="btn btn-success" type="submit">Скачать документ</button>
+    <a class="btn btn-danger" href="/clients">Назад</a>
+    <br>
+    <br>
 </form>
 <h3>{{ message }}</h3>
 {% endblock %}

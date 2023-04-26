@@ -1,0 +1,16 @@
+{% extends "header.html" %}
+{% block head %}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/new_client.css') }}">
+{% endblock %}
+{% block content %}
+<br>
+<br>
+<div class="register-text" style="margin: 0 auto; text-align: center">
+    <h1>МЕСТОПОЛОЖЕНИЕ КЛИЕНТА НА КАРТЕ</h1>
+</div>
+<br>
+<img style="margin: 0 auto; display: block; border: 4px solid #373737;" src="{{ url_for('static',filename='img/map.png') }}">
+<br>
+<a class="btn btn-danger" href="/clients">Назад</a>
+<br>
+{% endblock %}

@@ -1,28 +1,31 @@
+import os
 from datetime import datetime
+
+import requests
 from docxtpl import DocxTemplate
 from flask import Flask, render_template, redirect, request
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
-from forms.sign_in_form import SignInForm
-from forms.register_form import RegisterForm
-from forms.add_client_form import AddClientForm
+from sqlalchemy.orm.exc import DetachedInstanceError
 
 from data import db_session
-from data.user import User
 from data.client import Client
+from data.user import User
+from forms.add_client_form import AddClientForm
+from forms.register_form import RegisterForm
+from forms.sign_in_form import SignInForm
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "DocC_Shield"
 login_manager = LoginManager()
 login_manager.init_app(app)
 
-
 DOCUMENTS = (
-    "Ходатайство об обеспечении иска",
-    "Заявление о выдачи испольнительного листа",
-    "Исковое заявление о защите чести",
-    "Исковое заявление о разделе наследства",
-    "Исковое заявление об обжаловании дисциплинарного взыскания",
-    "Ходатайство об истребовании документа"
+    "ХОДАТАЙСТВО ОБ ОБЕСПЕЧЕНИИ ИСКА",
+    "ЗАЯВЛЕНИЕ О ВЫДАЧЕ ИСПОЛНИТЕЛЬНОГО ЛИСТА",
+    "ИСКОВОЕ ЗАЯВЛЕНИЕ О ЗАЩИТЕ ЧЕСТИ",
+    "ИСКОВОЕ ЗАЯВЛЕНИЕ О РАЗДЕЛЕ НАСЛЕДСТВА",
+    "ИСКОВОЕ ЗАЯВЛЕНИЕ ОБ ОБЖАЛОВАНИИ ДИСЦИПЛИНАРНОГО ВЗЫСКАНИЯ",
+    "ХОДАТАЙСТВО ОБ ИСТРЕБОВАНИИ ДОКУМЕНТА"
 )
 
 
@@ -114,8 +117,10 @@ def add_client():
 
         client.address = form.address.data
         client.birth_date = datetime.strptime(form.birth_date.data, "%Y-%m-%d")
-
-        current_user.clients.append(client)
+        try:
+            current_user.clients.append(client)
+        except DetachedInstanceError:
+            current_user.clients.append(client)
         new_session.merge(current_user)
         new_session.commit()
         return redirect("/clients")
@@ -164,32 +169,64 @@ def remove_client(client_id):
     return redirect("/clients")
 
 
+@app.route("/show_address/<int:client_id>", methods=["GET", "POST"])
+@login_required
+def show_address(client_id):
+    new_session = db_session.create_session()
+    client = new_session.query(Client).filter(Client.id == client_id).first()
+    lon, lat = map(float, requests.get(f'https://geocode-maps.yandex.ru/1.x/',
+                                       params={
+                                           'apikey': '40d1649f-0493-4b70-98ba-98533de7710b',
+                                           'geocode': f'{client.address}',
+                                           'format': 'json'
+                                       }).json()[
+        "response"][
+        "GeoObjectCollection"][
+        "featureMember"][0][
+        "GeoObject"][
+        "Point"][
+        'pos'].split())
+    map_request = f"http://static-maps.yandex.ru/1.x/?ll={lon},{lat}&" \
+                  f"spn=0.005,0.005&l=map&pt={lon},{lat},pm2rdm"
+    response = requests.get(map_request)
+    with open('static/img/map.png', "wb") as file:
+        file.write(response.content)
+    return render_template('show_address.html', user=current_user)
+
+
 @app.route("/create_document", methods=["GET", "POST"])
 def new_document():
     new_session = db_session.create_session()
     user_clients = new_session.query(Client).filter((Client.user == current_user))
-
     if request.method == "GET" or not (document_id := request.form.get("document_id")):
         return render_template(
             "create_document.html",
             title="Новый документ",
             clients=user_clients,
-            documents=enumerate(DOCUMENTS)
+            documents=enumerate(DOCUMENTS),
+            user=current_user
         )
-
-    client = new_session.query(Client).filter(Client.id == request.form.get("client_id")).first()
-    context = {
-        "surname":          client.surname,
-        "name":             client.name,
-        "patronymic":       client.patronymic,
-        "address":          client.address,
-        "birth_date_place": client.birth_date
-    }
-    document_way = """/static/documents/NewDocument.docx"""
-    document = DocxTemplate(f"""static/documents/{document_id}.docx""")
-    document.render(context)
-    document.save(f"./{document_way}")
-    return redirect("/static/documents/NewDocument.docx")
+    if request.form.get("client_id") != 'Nothing':
+        client = new_session.query(Client).filter(Client.id == request.form.get("client_id")).first()
+        context = {
+            "surname": client.surname,
+            "name": client.name,
+            "patronymic": client.patronymic,
+            "address": client.address,
+            "birth_date_place": client.birth_date
+        }
+        document_way = """/static/documents/NewDocument.docx"""
+        document = DocxTemplate(f"""static/documents/{document_id}.docx""")
+        document.render(context)
+        document.save(f"./{document_way}")
+        return redirect("/static/documents/NewDocument.docx")
+    return render_template(
+        "create_document.html",
+        title="Новый документ",
+        clients=user_clients,
+        documents=enumerate(DOCUMENTS),
+        user=current_user
+    )
 
 
 @app.errorhandler(404)

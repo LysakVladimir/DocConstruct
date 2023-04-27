@@ -221,6 +221,7 @@ def new_document():
     document = DocxTemplate(f"""static/documents/{document_id}.docx""")
     document.render(context)
     document.save(f"./{document_way}")
+
     return redirect("/static/documents/NewDocument.docx")
 
 

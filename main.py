@@ -1,7 +1,6 @@
-import os
-from datetime import datetime
-
 import requests
+
+from datetime import datetime
 from docxtpl import DocxTemplate
 from flask import Flask, render_template, redirect, request
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
@@ -10,6 +9,7 @@ from sqlalchemy.orm.exc import DetachedInstanceError
 from data import db_session
 from data.client import Client
 from data.user import User
+
 from forms.add_client_form import AddClientForm
 from forms.register_form import RegisterForm
 from forms.sign_in_form import SignInForm
@@ -198,7 +198,8 @@ def show_address(client_id):
 def new_document():
     new_session = db_session.create_session()
     user_clients = new_session.query(Client).filter((Client.user == current_user))
-    if request.method == "GET" or not (document_id := request.form.get("document_id")):
+
+    if request.method == "GET" or request.form.get("client_id") == 'Nothing':
         return render_template(
             "create_document.html",
             title="Новый документ",
@@ -206,27 +207,21 @@ def new_document():
             documents=enumerate(DOCUMENTS),
             user=current_user
         )
-    if request.form.get("client_id") != 'Nothing':
-        client = new_session.query(Client).filter(Client.id == request.form.get("client_id")).first()
-        context = {
-            "surname": client.surname,
-            "name": client.name,
-            "patronymic": client.patronymic,
-            "address": client.address,
-            "birth_date_place": client.birth_date
-        }
-        document_way = """/static/documents/NewDocument.docx"""
-        document = DocxTemplate(f"""static/documents/{document_id}.docx""")
-        document.render(context)
-        document.save(f"./{document_way}")
-        return redirect("/static/documents/NewDocument.docx")
-    return render_template(
-        "create_document.html",
-        title="Новый документ",
-        clients=user_clients,
-        documents=enumerate(DOCUMENTS),
-        user=current_user
-    )
+
+    client = new_session.query(Client).filter(Client.id == request.form.get("client_id")).first()
+    document_id = request.form.get("document_id")
+    context = {
+        "surname": client.surname,
+        "name": client.name,
+        "patronymic": client.patronymic,
+        "address": client.address,
+        "birth_date_place": client.birth_date
+    }
+    document_way = """/static/documents/NewDocument.docx"""
+    document = DocxTemplate(f"""static/documents/{document_id}.docx""")
+    document.render(context)
+    document.save(f"./{document_way}")
+    return redirect("/static/documents/NewDocument.docx")
 
 
 @app.errorhandler(404)
